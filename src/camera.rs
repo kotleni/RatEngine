@@ -1,7 +1,9 @@
 use nalgebra::{Matrix4, Rotation3, Vector3};
-use crate::utils::{get_position_from_matrix, get_rotation_from_matrix};
+use nalgebra_glm as glm;
+use sdl2::keyboard::KeyboardState;
+use sdl2::mouse::RelativeMouseState;
 
-pub(crate) struct Camera {
+pub struct Camera {
     pub position: Vector3<f32>,
     pub rotation: Rotation3<f32>,
 
@@ -15,94 +17,82 @@ pub(crate) struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self {
+    pub fn new() -> Camera {
+        let position = Vector3::new(0.0, 0.0, 5.0);
+        let view_matrix = glm::look_at(
+            &position,
+            &Vector3::new(0.0, 0.0, 0.0),
+            &Vector3::new(0.0, 1.0, 0.0),
+        );
+        let projection_matrix = glm::perspective(
+            800.0 / 600.0,
+            70.0,
+            0.1,
+            1000.0,
+        );
+
         Camera {
-            position: Vector3::new(0.0, 0.0, 3.0),
+            position,
             rotation: Rotation3::from_euler_angles(0.0, 0.0, 0.0),
 
-            mouse_sensitivity: 0.1,
             move_speed: 3.0,
+            mouse_sensitivity: 0.1,
             yaw: 0.0,
             pitch: 0.0,
 
-            view_matrix: Matrix4::identity(),
-            projection_matrix: Matrix4::new_perspective(800.0 / 600.0, 70.0, 0.1, 1000.0),
+            view_matrix,
+            projection_matrix,
         }
     }
 
-    pub fn get_forward_vector(&self) -> Vector3<f32> {
-        let direction = Vector3::new(
-            self.yaw.to_radians().cos() * self.pitch.to_radians().cos(),
-            self.pitch.to_radians().sin(),
-            self.yaw.to_radians().sin() * self.pitch.to_radians().cos()
-        );
-
-        direction.normalize()
+    pub fn look_at(&mut self, target: &Vector3<f32>, up: &Vector3<f32>) {
+        self.view_matrix = glm::look_at(&self.position, target, up);
     }
 
-    pub fn get_right_vector(&self) -> Vector3<f32> {
-        let right = self.rotation * Vector3::new(1.0, 0.0, 0.0);
-        right.normalize()
-    }
+    pub fn process_input(&mut self, ks: &KeyboardState, ms: &RelativeMouseState) {
+        // look around
+        let relx = ms.x() as f32 * self.mouse_sensitivity;
+        let rely = ms.y() as f32 * self.mouse_sensitivity;
 
-    pub fn get_up_vector(&self) -> Vector3<f32> {
-        let up = self.rotation * Vector3::new(0.0, 1.0, 0.0);
-        up.normalize()
-    }
+        self.yaw += relx;
+        self.pitch -= rely;
 
-    pub fn process_input(&mut self, keys: &sdl2::keyboard::KeyboardState, mouse_state: &sdl2::mouse::RelativeMouseState) {
-        // Keyboard input
-        if keys.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
-            self.position += self.get_forward_vector() * self.move_speed;
+        if self.pitch > 89.0 {
+            self.pitch = 89.0;
         }
-        if keys.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
-            self.position -= self.get_forward_vector() * self.move_speed;
-        }
-        if keys.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
-            self.position -= self.get_right_vector() * self.move_speed;
-        }
-        if keys.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
-            self.position += self.get_right_vector() * self.move_speed;
+        if self.pitch < -89.0 {
+            self.pitch = -89.0;
         }
 
-        // Mouse input
-        let xrel = -mouse_state.x();
-        let yrel = mouse_state.y();
-        self.yaw += xrel as f32 * self.mouse_sensitivity;
-        self.pitch += yrel as f32 * self.mouse_sensitivity;
+        let yaw_rad = self.yaw.to_radians();
+        let pitch_rad = self.pitch.to_radians();
 
-        // Limit pitch to prevent camera flipping
-        self.pitch = self.pitch.clamp(-89.0, 89.0);
+        let front = Vector3::new(
+            yaw_rad.cos() * pitch_rad.cos(),
+            pitch_rad.sin(),
+            yaw_rad.sin() * pitch_rad.cos(),
+        ).normalize();
 
-        // Update camera's rotation based on yaw and pitch
-        // println!("yaw: {}, pitch: {}", self.yaw, self.pitch);
-        self.update();
-    }
+        self.rotation = Rotation3::face_towards(&front, &Vector3::new(0.0, 1.0, 0.0));
 
-    pub fn update(&mut self) {
-        let direction = self.get_forward_vector();
-        let up = self.get_up_vector();
+        // move
+        let mut direction = Vector3::new(0.0, 0.0, 0.0);
+        if ks.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
+            direction += front;
+        }
+        if ks.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
+            direction -= front;
+        }
+        if ks.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
+            direction -= front.cross(&Vector3::new(0.0, 1.0, 0.0)).normalize();
+        }
+        if ks.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
+            direction += front.cross(&Vector3::new(0.0, 1.0, 0.0)).normalize();
+        }
 
-        self.rotation = Rotation3::face_towards(&direction, &up);
-        self.view_matrix = self.rotation.to_homogeneous() * Matrix4::new_translation(&-self.position);
-    }
-
-    pub fn look_at(&mut self, eye: &Vector3<f32>, center: &Vector3<f32>, up: &Vector3<f32>) {
-        let f = (center - eye).normalize();
-        let s = f.cross(up).normalize();
-        let u = s.cross(&f);
-
-        let new_matrix = Matrix4::new(
-            s.x, u.x, -f.x, 0.0,
-            s.y, u.y, -f.y, 0.0,
-            s.z, u.z, -f.z, 0.0,
-            -eye.dot(&s), -eye.dot(&u), eye.dot(&f), 1.0,
-        );
-
-        let new_rotation = get_rotation_from_matrix(&new_matrix);
-        self.yaw = new_rotation.euler_angles().0.to_degrees();
-        self.pitch = new_rotation.euler_angles().1.to_degrees();
-
-        self.update();
+        let to = direction * self.move_speed;
+        self.position += to;
+        println!("to {:?}", to);
+        self.view_matrix = glm::look_at(&self.position, &(self.position + front), &Vector3::new(0.0, 1.0, 0.0));
     }
 }

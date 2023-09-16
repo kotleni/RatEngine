@@ -61,7 +61,7 @@ impl RatWindow {
         let scaling = Matrix4::new_scaling(1.0);
 
         let object_position = Vector3::new(x, y, z);
-        camera.look_at(&Vector3::new(0.0, 0.0, 0.0), &object_position, &Vector3::new(0.0, 1.0, 0.0));
+        camera.look_at(&object_position, &Vector3::new(0.0, 1.0, 0.0));
 
         let mut event_pump = self.sdl.event_pump().unwrap();
         'main: loop {
