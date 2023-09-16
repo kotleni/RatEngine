@@ -44,8 +44,13 @@ impl RatWindow {
 
             // TODO: bug if reverse this - some polygons are not rendered
             // TODO: but if stay current, other polygons rendered uncorrectly
+            // Cull back faces
             gl::CullFace(gl::FRONT);
             gl::FrontFace(gl::CCW);
+
+            // Alpha blending
+            gl::Enable(gl::BLEND);
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
             gl::ClearColor(0.3, 0.3, 0.5, 1.0);
         }
