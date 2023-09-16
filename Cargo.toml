@@ -1,0 +1,10 @@
+[package]
+name = "ratengine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sdl2 = "0.35.2"
+gl = "0.14.0"
+tobj = "4.0.0"
+nalgebra = "0.32.3"
