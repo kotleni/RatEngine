@@ -34,8 +34,6 @@ impl RatWindow {
         }
     }
 
-
-
     pub fn run_loop(&mut self) {
         let _gl_context = self.sdl_window.gl_create_context().unwrap();
         let _gl = gl::load_with(|s| self.video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void);
