@@ -91,8 +91,7 @@ impl Camera {
         }
 
         let to = direction * self.move_speed;
-        self.position += to;
-        println!("to {:?}", to);
-        self.view_matrix = glm::look_at(&self.position, &(self.position + front), &Vector3::new(0.0, 1.0, 0.0));
+        //self.position += to;
+        //self.view_matrix = glm::look_at(&self.position, &(self.position + front), &Vector3::new(0.0, 1.0, 0.0));
     }
 }
