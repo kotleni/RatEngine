@@ -39,6 +39,14 @@ impl RatWindow {
         let _gl = gl::load_with(|s| self.video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void);
 
         unsafe {
+            gl::Enable(gl::DEPTH_TEST);
+            gl::Enable(gl::CULL_FACE);
+
+            // TODO: bug if reverse this - some polygons are not rendered
+            // TODO: but if stay current, other polygons rendered uncorrectly
+            gl::CullFace(gl::FRONT);
+            gl::FrontFace(gl::CCW);
+
             gl::ClearColor(0.3, 0.3, 0.5, 1.0);
         }
 
