@@ -39,9 +39,12 @@ impl RatShader {
         shader
     }
 
-    pub fn from_file(path: &str) -> Self {
-        let vert_id = RatShader::load_shader(&*(path.to_owned() + ".vert"), gl::VERTEX_SHADER);
-        let frag_id = RatShader::load_shader(&*(path.to_owned() + ".frag    "), gl::FRAGMENT_SHADER);
+    pub fn from_file(name: &str) -> Self {
+        let vert_path = format!("assets/shaders/{}.vert", name);
+        let frag_path = format!("assets/shaders/{}.frag", name);
+
+        let vert_id = RatShader::load_shader(&vert_path, gl::VERTEX_SHADER);
+        let frag_id = RatShader::load_shader(&frag_path, gl::FRAGMENT_SHADER);
 
         RatShader {
             vert_id,

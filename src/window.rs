@@ -57,8 +57,8 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("assets/teapot.obj");
-        let shader = RatShader::from_file("assets/default");
+        let model = ObjModel::from_file("teapot");
+        let shader = RatShader::from_file("default");
 
         let x = 0.0;
         let y = 0.0;

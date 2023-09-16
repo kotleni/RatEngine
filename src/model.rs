@@ -7,8 +7,8 @@ pub struct ObjModel {
 }
 
 impl ObjModel {
-    pub fn from_file(path: &str) -> Self {
-
+    pub fn from_file(name: &str) -> Self {
+        let path = format!("assets/models/{}.obj", name);
         let (models, materials) = tobj::load_obj(
             path,
             &tobj::LoadOptions::default()
