@@ -18,6 +18,10 @@ pub struct RatWindow {
 impl RatWindow {
     pub fn new(w: u32, h: u32) -> Self {
         let sdl = sdl2::init().unwrap();
+
+        sdl2::hint::set("SDL_HINT_RENDER_SCALE_QUALITY", "8");
+        sdl2::hint::set("SDL_HINT_RENDER_VSYNC", "1");
+
         let video_subsystem = sdl.video().unwrap();
         let window = video_subsystem
             .window("Rat Engine", w, h)
@@ -47,6 +51,7 @@ impl RatWindow {
 
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
+            gl::Enable(gl::MULTISAMPLE);
             //gl::Enable(gl::CULL_FACE);
 
             // Cull back faces
@@ -62,7 +67,7 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("blob", "blob");
+        let model = ObjModel::from_file("rat", "rat");
         let shader = RatShader::from_file("default");
 
         let x = 0.0;
