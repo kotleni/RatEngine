@@ -1,14 +1,12 @@
-use std::ffi::CString;
-use nalgebra::{Matrix4, Rotation3, Vector3};
+
+use nalgebra::{Vector3};
 use sdl2::event;
 use sdl2::keyboard::Keycode;
 use sdl2::video::{GLProfile, Window};
 use crate::assets_manager::AssetsManager;
 use crate::camera::Camera;
 use crate::engine::engine;
-use crate::model::ObjModel;
 use crate::renderer::RatRenderer;
-use crate::shader::RatShader;
 
 pub struct RatWindow {
     pub sdl: sdl2::Sdl,
@@ -69,9 +67,6 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        // let model = AssetsManager::load_model("rat", "rat");
-        // let shader = AssetsManager::load_shader("default");
-
         let object = AssetsManager::load_object("rat");
 
         let x = 0.0;
@@ -81,11 +76,6 @@ impl RatWindow {
         // Lock mouse to window
         let mut is_mouse_locked = true;
         self.sdl.mouse().set_relative_mouse_mode(is_mouse_locked);
-
-        // let translation = Matrix4::new_translation(&Vector3::new(x, y, z));
-        // let mut rotation = Rotation3::from_euler_angles(0.0, 0.0, 0.0).to_homogeneous();
-        // // let mut rotation = Matrix4::new_rotation( Vector3::new(0.0, 0.0, 0.0));
-        // let scaling = Matrix4::new_scaling(1.0);
 
         let object_position = Vector3::new(x, y, z);
         camera.look_at(&object_position, &Vector3::new(0.0, 1.0, 0.0));
@@ -113,12 +103,7 @@ impl RatWindow {
             camera.process_input(&event_pump.keyboard_state(), &event_pump.relative_mouse_state());
 
             self.renderer.clear();
-            // let shader_program = self.renderer.use_shader(&prefab.material.shader);
-
             self.renderer.render_model(&object, &camera);
-
-            // rotation *= Rotation3::from_euler_angles(0.0, 0.01, 0.0).to_homogeneous();
-
             self.sdl_window.gl_swap_window();
         }
     }
