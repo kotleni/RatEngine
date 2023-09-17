@@ -47,6 +47,11 @@ impl RatWindow {
 
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
+            gl::Enable(gl::CULL_FACE);
+
+            // Cull back faces
+            gl::CullFace(gl::FRONT);
+            gl::FrontFace(gl::CCW);
 
             // Alpha blending
             gl::Enable(gl::BLEND);
@@ -57,12 +62,12 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("sofa");
+        let model = ObjModel::from_file("teapot");
         let shader = RatShader::from_file("default");
 
         let x = 0.0;
         let y = 0.0;
-        let z = 20.0;
+        let z = 220.0;
 
         // Lock mouse to window
         let mut is_mouse_locked = true;
