@@ -118,30 +118,34 @@ impl RatRenderer {
         mesh.indices.len() as i32
     }
 
-    pub fn bind_ojbmodel_buffers(&mut self, model: &ObjModel) -> i32 {
-        let mut total_indices: i32 = 0;
+    pub fn render_model(&mut self, model: &ObjModel) {
         for m in &model.models {
             let mesh = &m.mesh;
-            total_indices += mesh.indices.len() as i32;
+            let total_indices = self.bind_buffers(m);
 
-            self.bind_buffers(m);
+            unsafe {
+                gl::BindVertexArray(self.vao);
+                gl::DrawElements(
+                    gl::TRIANGLES,
+                    total_indices,
+                    gl::UNSIGNED_INT,
+                    std::ptr::null(),
+                );
+                gl::BindVertexArray(0);
+            }
         }
 
-        total_indices
-    }
-
-    pub fn render_model(&mut self, model: &ObjModel) {
-        let total_indices = self.bind_ojbmodel_buffers(model);
-
-        unsafe {
-            gl::BindVertexArray(self.vao);
-            gl::DrawElements(
-                gl::TRIANGLES,
-                total_indices,
-                gl::UNSIGNED_INT,
-                std::ptr::null(),
-            );
-            gl::BindVertexArray(0);
-        }
+        // let total_indices = self.bind_ojbmodel_buffers(model);
+        //
+        // unsafe {
+        //     gl::BindVertexArray(self.vao);
+        //     gl::DrawElements(
+        //         gl::TRIANGLES,
+        //         total_indices,
+        //         gl::UNSIGNED_INT,
+        //         std::ptr::null(),
+        //     );
+        //     gl::BindVertexArray(0);
+        // }
     }
 }
