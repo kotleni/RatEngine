@@ -9,7 +9,6 @@ pub struct Material {
 
 impl Material {
     pub fn bind(&self) {
-        // TODO: self.shader.bind();
         unsafe {
             gl::BindTexture(gl::TEXTURE_2D, self.texture_id);
         }

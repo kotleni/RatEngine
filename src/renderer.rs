@@ -1,6 +1,8 @@
 use gl::types::{GLchar, GLfloat, GLint, GLsizeiptr, GLuint, GLvoid};
 use tobj::Model;
+use crate::camera::Camera;
 use crate::model::{ObjModel};
+use crate::prefab::Prefab;
 use crate::shader::RatShader;
 
 pub struct RatRenderer {
@@ -23,44 +25,6 @@ impl RatRenderer {
             // Clear the screen with depth buffer
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
-    }
-
-    pub fn use_shader(&self, shader: &RatShader) -> GLuint {
-        let shader_program;
-        unsafe {
-            shader_program = gl::CreateProgram();
-            gl::AttachShader(shader_program, shader.vert_id);
-            gl::AttachShader(shader_program, shader.frag_id);
-            gl::LinkProgram(shader_program);
-
-            let mut success = gl::FALSE as GLint;
-            gl::GetProgramiv(shader_program, gl::LINK_STATUS, &mut success);
-
-            if success != gl::TRUE as GLint {
-                let mut len = 0;
-                gl::GetProgramiv(shader_program, gl::INFO_LOG_LENGTH, &mut len);
-                let mut info_log = Vec::with_capacity(len as usize);
-                info_log.set_len((len as usize) - 1); // subtract 1 to skip the null terminator
-                gl::GetProgramInfoLog(
-                    shader_program,
-                    len,
-                    std::ptr::null_mut(),
-                    info_log.as_mut_ptr() as *mut GLchar,
-                );
-                panic!(
-                    "Shader program linking failed:\n{}",
-                    String::from_utf8_lossy(&info_log)
-                );
-            }
-            gl::DeleteShader(shader.vert_id);
-            gl::DeleteShader(shader.frag_id);
-        }
-
-        unsafe {
-            gl::UseProgram(shader_program);
-        }
-
-        shader_program
     }
 
     pub fn bind_buffers(&mut self, model: &Model) -> i32 {
@@ -134,11 +98,12 @@ impl RatRenderer {
         mesh.indices.len() as i32
     }
 
-    pub fn render_model(&mut self, model: &ObjModel) {
+    pub fn render_model(&mut self, prefab: &Prefab, camera: &Camera) {
+        let model = &prefab.model;
         for m in &model.models {
             let total_indices = self.bind_buffers(m);
 
-            model.material.bind();
+            model.bind(prefab, camera);
 
             unsafe {
                 gl::BindVertexArray(self.vao);

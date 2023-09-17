@@ -22,10 +22,14 @@ impl AssetsManager {
         let vert_id = RatShader::compile_shader(&frag_src, gl::VERTEX_SHADER);
         let frag_id = RatShader::compile_shader(&vert_src, gl::FRAGMENT_SHADER);
 
-        RatShader {
+        let mut shader = RatShader {
             vert_id,
             frag_id,
-        }
+            shader_program: 0,
+        };
+        shader.use_shader();
+
+        shader
     }
 
     pub fn load_texture(name: &str) -> GLuint {
