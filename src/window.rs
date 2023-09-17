@@ -71,7 +71,7 @@ impl RatWindow {
         // let model = AssetsManager::load_model("rat", "rat");
         // let shader = AssetsManager::load_shader("default");
 
-        let prefab = AssetsManager::load_prefab("rat");
+        let object = AssetsManager::load_object("rat");
 
         let x = 0.0;
         let y = 0.0;
@@ -112,7 +112,7 @@ impl RatWindow {
             self.renderer.clear();
             // let shader_program = self.renderer.use_shader(&prefab.material.shader);
 
-            self.renderer.render_model(&prefab, &camera);
+            self.renderer.render_model(&object, &camera);
 
             // rotation *= Rotation3::from_euler_angles(0.0, 0.01, 0.0).to_homogeneous();
 

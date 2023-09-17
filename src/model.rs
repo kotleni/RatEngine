@@ -1,6 +1,6 @@
 use crate::camera::Camera;
 use crate::material::Material;
-use crate::prefab::Prefab;
+use crate::object::RatObject;
 
 pub struct ObjModel {
     pub models: Vec<tobj::Model>,
@@ -8,8 +8,8 @@ pub struct ObjModel {
 }
 
 impl ObjModel {
-    pub fn bind(&self, prefab: &Prefab, camera: &Camera) {
-        self.material.shader.bind(prefab, camera);
+    pub fn bind(&self, object: &RatObject, camera: &Camera) {
+        self.material.shader.bind(object, camera);
         self.material.bind();
     }
 }

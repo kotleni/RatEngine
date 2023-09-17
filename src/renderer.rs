@@ -2,7 +2,7 @@ use gl::types::{GLchar, GLfloat, GLint, GLsizeiptr, GLuint, GLvoid};
 use tobj::Model;
 use crate::camera::Camera;
 use crate::model::{ObjModel};
-use crate::prefab::Prefab;
+use crate::object::RatObject;
 use crate::shader::RatShader;
 
 pub struct RatRenderer {
@@ -98,12 +98,12 @@ impl RatRenderer {
         mesh.indices.len() as i32
     }
 
-    pub fn render_model(&mut self, prefab: &Prefab, camera: &Camera) {
-        let model = &prefab.model;
+    pub fn render_model(&mut self, object: &RatObject, camera: &Camera) {
+        let model = &object.model;
         for m in &model.models {
             let total_indices = self.bind_buffers(m);
 
-            model.bind(prefab, camera);
+            model.bind(object, camera);
 
             unsafe {
                 gl::BindVertexArray(self.vao);

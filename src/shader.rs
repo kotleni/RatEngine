@@ -3,7 +3,7 @@ use gl::types::{GLchar, GLint, GLuint};
 use nalgebra::Matrix4;
 use crate::camera::Camera;
 use crate::model::ObjModel;
-use crate::prefab::Prefab;
+use crate::object::RatObject;
 
 pub struct RatShader {
     pub vert_id: GLuint,
@@ -74,12 +74,12 @@ impl RatShader {
         }
     }
 
-    pub fn bind(&self, prefab: &Prefab, camera: &Camera) {
+    pub fn bind(&self, object: &RatObject, camera: &Camera) {
         unsafe {
             // model matrix
             let model_location = gl::GetUniformLocation(self.shader_program, CString::new("model").unwrap().as_ptr());
-            let translation = Matrix4::new_translation(&prefab.position);
-            let rotation = Matrix4::from(prefab.rotation);
+            let translation = Matrix4::new_translation(&object.position);
+            let rotation = Matrix4::from(object.rotation);
             let scale = Matrix4::new_scaling(1.0); // TODO: Not implemented yet
 
             let model_matrix = translation * rotation * scale;

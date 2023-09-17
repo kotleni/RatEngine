@@ -1,9 +1,8 @@
 use nalgebra::{Rotation3, Vector3};
-use tobj::Model;
 use crate::material::Material;
 use crate::model::ObjModel;
 
-pub struct Prefab {
+pub struct RatObject {
     pub name: String,
     pub model: ObjModel,
     pub material: Material,

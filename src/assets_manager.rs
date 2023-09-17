@@ -3,7 +3,7 @@ use gl::types::GLuint;
 use stb_image::stb_image::bindgen::{stbi_image_free, stbi_load, stbi_set_flip_vertically_on_load};
 use crate::material::Material;
 use crate::model::ObjModel;
-use crate::prefab::Prefab;
+use crate::object::RatObject;
 use crate::rat_cfg::RatCfg;
 use crate::shader::RatShader;
 
@@ -140,8 +140,8 @@ impl AssetsManager {
         }
     }
 
-    pub fn load_prefab(name: &str) -> Prefab {
-        let path = format!("assets/prefabs/{}.prefab", name);
+    pub fn load_object(name: &str) -> RatObject {
+        let path = format!("assets/objects/{}.robj", name);
         let cfg = AssetsManager::load_cfg(&path);
 
         let name = cfg.get_str("name");
@@ -153,7 +153,7 @@ impl AssetsManager {
 
         let weight = cfg.get_f32("weight");
 
-        Prefab {
+        RatObject {
             name,
             model,
             material,
