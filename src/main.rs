@@ -5,6 +5,7 @@ mod window;
 mod model;
 mod renderer;
 mod material;
+mod assets_manager;
 
 extern crate sdl2;
 extern crate gl;

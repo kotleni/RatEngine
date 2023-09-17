@@ -6,9 +6,7 @@ pub struct RatShader {
 }
 
 impl RatShader {
-    pub fn load_shader(path: &str, shader_type: GLuint) -> GLuint {
-        let src = std::fs::read_to_string(path).unwrap();
-
+    pub fn compile_shader(src: &str, shader_type: GLuint) -> GLuint {
         let shader;
         unsafe {
             shader = gl::CreateShader(shader_type);
@@ -37,18 +35,5 @@ impl RatShader {
         }
 
         shader
-    }
-
-    pub fn from_file(name: &str) -> Self {
-        let vert_path = format!("assets/shaders/{}.vert", name);
-        let frag_path = format!("assets/shaders/{}.frag", name);
-
-        let vert_id = RatShader::load_shader(&vert_path, gl::VERTEX_SHADER);
-        let frag_id = RatShader::load_shader(&frag_path, gl::FRAGMENT_SHADER);
-
-        RatShader {
-            vert_id,
-            frag_id,
-        }
     }
 }

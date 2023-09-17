@@ -3,6 +3,7 @@ use nalgebra::{Matrix4, Rotation3, Vector3};
 use sdl2::event;
 use sdl2::keyboard::Keycode;
 use sdl2::video::{GLProfile, Window};
+use crate::assets_manager::AssetsManager;
 use crate::camera::Camera;
 use crate::model::ObjModel;
 use crate::renderer::RatRenderer;
@@ -67,8 +68,8 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("rat", "rat");
-        let shader = RatShader::from_file("default");
+        let model = AssetsManager::load_model("rat", "rat");
+        let shader = AssetsManager::load_shader("default");
 
         let x = 0.0;
         let y = 0.0;
