@@ -3,6 +3,8 @@ use gl::types::GLuint;
 use stb_image::stb_image::bindgen::{stbi_image_free, stbi_load, stbi_set_flip_vertically_on_load};
 use crate::material::Material;
 use crate::model::ObjModel;
+use crate::prefab::Prefab;
+use crate::rat_cfg::RatCfg;
 use crate::shader::RatShader;
 
 pub struct AssetsManager {
@@ -26,8 +28,9 @@ impl AssetsManager {
         }
     }
 
-    pub fn load_material(name: &str) -> Material {
-        let path = format!("assets/textures/{}.png", name);
+    pub fn load_texture(name: &str) -> GLuint {
+        // MARK: Name have extension
+        let path = format!("assets/textures/{}", name);
         let cpath = CString::new(path).unwrap();
 
         let mut texture_id: GLuint = 0;
@@ -55,7 +58,8 @@ impl AssetsManager {
             if data.is_null() {
                 let err = stb_image::stb_image::bindgen::stbi_failure_reason();
                 let err = std::ffi::CStr::from_ptr(err).to_str().unwrap();
-                panic!("Failed to load texture: {}", err);
+                let ppath = std::ffi::CStr::from_ptr(cpath.as_ptr()).to_str().unwrap();
+                println!("Failed to load texture: {} ({})", ppath, err);
             }
 
             // println!("Loaded texture: {} ({}x{})", name, width, height);
@@ -75,7 +79,26 @@ impl AssetsManager {
             stbi_image_free(data as *mut std::os::raw::c_void);
         }
 
-        Material { texture_id }
+        texture_id
+    }
+
+    pub fn load_material(name: &str) -> Material {
+        let path = format!("assets/materials/{}.mat", name);
+        let cfg = AssetsManager::load_cfg(&path);
+
+        let name = cfg.get_str("name");
+
+        let shader_name = cfg.get_str("shader");
+        let shader = AssetsManager::load_shader(&shader_name);
+
+        let texture_name = cfg.get_str("texture");
+        let texture = AssetsManager::load_texture(&texture_name);
+
+        Material {
+            name,
+            shader,
+            texture_id: texture,
+        }
     }
 
     pub fn load_model(obj_name: &str, mat_name: &str) -> ObjModel {
@@ -92,5 +115,48 @@ impl AssetsManager {
         ).expect("Failed to OBJ load file");
 
         ObjModel { models, material }
+    }
+
+    pub fn load_cfg(path: &str) -> RatCfg {
+        let content = std::fs::read_to_string(path).unwrap();
+        let lines = content.lines();
+
+        let mut dict = std::collections::HashMap::new();
+        for line in lines {
+            let mut parts = line.split('=');
+            let key = parts.next().unwrap().trim();
+            let value = parts.next().unwrap().trim();
+
+            dict.insert(key.to_string(), value.to_string());
+        }
+
+        RatCfg {
+            file_path: path.to_string(),
+            dict,
+        }
+    }
+
+    pub fn load_prefab(name: &str) -> Prefab {
+        let path = format!("assets/prefabs/{}.prefab", name);
+        let cfg = AssetsManager::load_cfg(&path);
+
+        let name = cfg.get_str("name");
+
+        let model_name = cfg.get_str("model");
+        let mat_name = cfg.get_str("material");
+        let model = AssetsManager::load_model(&model_name, &mat_name);
+        let material = AssetsManager::load_material(&mat_name);
+
+        let weight = cfg.get_f32("weight");
+
+        Prefab {
+            name,
+            model,
+            material,
+            position: nalgebra_glm::Vec3::new(0.0, 0.0, 0.0),
+            rotation: nalgebra::Rotation3::from_euler_angles(0.0, 0.0, 0.0),
+            scale: nalgebra_glm::Vec3::new(1.0, 1.0, 1.0),
+            weight,
+        }
     }
 }

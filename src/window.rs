@@ -68,8 +68,10 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = AssetsManager::load_model("rat", "rat");
-        let shader = AssetsManager::load_shader("default");
+        // let model = AssetsManager::load_model("rat", "rat");
+        // let shader = AssetsManager::load_shader("default");
+
+        let prefab = AssetsManager::load_prefab("rat");
 
         let x = 0.0;
         let y = 0.0;
@@ -108,7 +110,7 @@ impl RatWindow {
             camera.process_input(&event_pump.keyboard_state(), &event_pump.relative_mouse_state());
 
             self.renderer.clear();
-            let shader_program = self.renderer.use_shader(&shader);
+            let shader_program = self.renderer.use_shader(&prefab.material.shader);
             unsafe {
                 // model matrix
                 let model_location = gl::GetUniformLocation(shader_program, CString::new("model").unwrap().as_ptr());
@@ -140,7 +142,7 @@ impl RatWindow {
                 // gl::UseProgram(shader_program);
             }
 
-            self.renderer.render_model(&model);
+            self.renderer.render_model(&prefab.model);
 
             rotation *= Rotation3::from_euler_angles(0.0, 0.01, 0.0).to_homogeneous();
 
