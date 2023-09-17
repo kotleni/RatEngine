@@ -27,7 +27,11 @@ impl Material {
             let mut height: i32 = 0;
             let mut nr_channels: i32 = 0;
 
+            // Enable flipping texture vertically
+            // OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image
             stbi_set_flip_vertically_on_load(i32::from(true));
+
+            // Load texture data from file
             let data = stbi_load(cpath.as_ptr(), &mut width, &mut height, &mut nr_channels, 0);
             if data.is_null() {
                 let err = stb_image::stb_image::bindgen::stbi_failure_reason();
@@ -35,8 +39,9 @@ impl Material {
                 panic!("Failed to load texture: {}", err);
             }
 
-            println!("Loaded texture: {} ({}x{})", name, width, height);
+            // println!("Loaded texture: {} ({}x{})", name, width, height);
 
+            // Determine texture format
             let format = match nr_channels {
                 1 => gl::RED,
                 2 => gl::RG,

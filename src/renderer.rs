@@ -20,6 +20,7 @@ impl RatRenderer {
 
     pub fn clear(&self) {
         unsafe {
+            // Clear the screen with depth buffer
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
     }

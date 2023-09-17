@@ -14,7 +14,7 @@ impl ObjModel {
         options.triangulate = true;
         options.single_index = true;
 
-        let (models, materials) = tobj::load_obj(
+        let (models, _) = tobj::load_obj(
             path,
             &options
         ).expect("Failed to OBJ load file");
