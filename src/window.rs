@@ -64,7 +64,7 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("blob");
+        let model = ObjModel::from_file("teapot");
         let shader = RatShader::from_file("default");
 
         let x = 0.0;
@@ -133,7 +133,7 @@ impl RatWindow {
                 let object_color_location = gl::GetUniformLocation(shader_program, CString::new("objectColor").unwrap().as_ptr());
                 gl::Uniform3f(object_color_location, 1.0, 0.5, 0.31);
 
-                // gl::UseProgram(shader_program);
+                gl::UseProgram(shader_program);
             }
 
             self.renderer.render_model(&model);
