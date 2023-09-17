@@ -1,5 +1,4 @@
 use gl::types::{GLfloat, GLuint};
-use nalgebra_glm::Vec3;
 
 pub struct Vertex {
     pub position: Vec<GLfloat>,
@@ -8,10 +7,8 @@ pub struct Vertex {
 }
 
 pub struct ObjModel {
-    //pub vertices: Vec<GLfloat>,
     pub indices: Vec<GLuint>,
     pub vertices: Vec<Vertex>,
-    //pub uv: Vec<GLfloat>,
 }
 
 impl ObjModel {
@@ -30,10 +27,6 @@ impl ObjModel {
 
         for (i, m) in models.iter().enumerate() {
             let mesh = &m.mesh;
-
-            // assert!(mesh.positions.len() % 3 == 0);
-            // assert!(mesh.texcoords.len() % 2 == 0);
-            // assert!(mesh.indices.len() % 3 == 0);
 
             if mesh.positions.len() % 3 != 0 {
                 println!("Mesh positions length is not divisible by 3! SKIP!");
@@ -83,6 +76,21 @@ impl ObjModel {
                     normals: normals.to_vec(),
                     tex_coords: tex_coords.to_vec(),
                 };
+
+                // debug print vertex data
+                // println!("Vertex[{}]: ", v);
+                // println!("positions: ");
+                // for i in 0..vertex.position.len() {
+                //     println !("{} ", vertex.position[i]);
+                // }
+                // println!("normals: ");
+                // for i in 0..vertex.normals.len() {
+                //     println !("{} ", vertex.normals[i]);
+                // }
+                // println!("tex_coords: ");
+                // for i in 0..vertex.tex_coords.len() {
+                //     println !("{} ", vertex.tex_coords[i]);
+                // }
 
                 model.vertices.push(vertex);
             }
