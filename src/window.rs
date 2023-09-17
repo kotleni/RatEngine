@@ -2,7 +2,7 @@ use std::ffi::CString;
 use nalgebra::{Matrix4, Rotation3, Vector3};
 use sdl2::event;
 use sdl2::keyboard::Keycode;
-use sdl2::video::Window;
+use sdl2::video::{GLProfile, Window};
 use crate::camera::Camera;
 use crate::model::ObjModel;
 use crate::renderer::RatRenderer;
@@ -35,6 +35,13 @@ impl RatWindow {
     }
 
     pub fn run_loop(&mut self) {
+        // Set OpenGL context attributes
+        self.video_subsystem.gl_attr().set_context_version(3, 3);
+        self.video_subsystem.gl_attr().set_context_profile(GLProfile::Core);
+        self.video_subsystem.gl_attr().set_context_flags().debug().set();
+        // self.video_subsystem.gl_attr().set_double_buffer(true);
+
+        // Create OpenGL context using CreateContextAttribs
         let _gl_context = self.sdl_window.gl_create_context().unwrap();
         let _gl = gl::load_with(|s| self.video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void);
 
@@ -57,7 +64,7 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("teapot");
+        let model = ObjModel::from_file("blob");
         let shader = RatShader::from_file("default");
 
         let x = 0.0;
@@ -125,6 +132,8 @@ impl RatWindow {
                 // object color
                 let object_color_location = gl::GetUniformLocation(shader_program, CString::new("objectColor").unwrap().as_ptr());
                 gl::Uniform3f(object_color_location, 1.0, 0.5, 0.31);
+
+                // gl::UseProgram(shader_program);
             }
 
             self.renderer.render_model(&model);

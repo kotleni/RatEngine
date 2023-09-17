@@ -1,12 +1,21 @@
 use gl::types::{GLfloat, GLuint};
+use nalgebra_glm::Vec3;
+
+pub struct Vertex {
+    pub position: Vec<GLfloat>,
+    pub normals: Vec<GLfloat>,
+    pub tex_coords: Vec<GLfloat>,
+}
 
 pub struct ObjModel {
-    pub vertices: Vec<GLfloat>,
+    //pub vertices: Vec<GLfloat>,
     pub indices: Vec<GLuint>,
-    pub uv: Vec<GLfloat>,
+    pub vertices: Vec<Vertex>,
+    //pub uv: Vec<GLfloat>,
 }
 
 impl ObjModel {
+
     pub fn from_file(name: &str) -> Self {
         let path = format!("assets/models/{}.obj", name);
         let (models, materials) = tobj::load_obj(
@@ -17,7 +26,6 @@ impl ObjModel {
         let mut model = ObjModel {
             vertices: Vec::new(),
             indices: Vec::new(),
-            uv: Vec::new(),
         };
 
         for (i, m) in models.iter().enumerate() {
@@ -45,9 +53,38 @@ impl ObjModel {
 
             // add vertices
             for v in 0..mesh.positions.len() / 3 {
-                model.vertices.push(mesh.positions[3 * v]);
-                model.vertices.push(mesh.positions[3 * v + 1]);
-                model.vertices.push(mesh.positions[3 * v + 2]);
+                let position = [
+                    mesh.positions[v],
+                    mesh.positions[v + 1],
+                    mesh.positions[v + 2],
+                ];
+
+                let normals = if !mesh.normals.is_empty() {
+                    [
+                        mesh.normals[v],
+                        mesh.normals[v + 1],
+                        mesh.normals[v + 2],
+                    ]
+                } else {
+                    [0.0, 0.0, 0.0]
+                };
+
+                let tex_coords = if !mesh.texcoords.is_empty() {
+                    [
+                        mesh.texcoords[v / 3 * 2],
+                        mesh.texcoords[v / 3 * 2 + 1],
+                    ]
+                } else {
+                    [0.0, 0.0]
+                };
+
+                let vertex = Vertex {
+                    position: position.to_vec(),
+                    normals: normals.to_vec(),
+                    tex_coords: tex_coords.to_vec(),
+                };
+
+                model.vertices.push(vertex);
             }
 
             // add indices
@@ -55,12 +92,6 @@ impl ObjModel {
                 model.indices.push(mesh.indices[3 * i] as u32);
                 model.indices.push(mesh.indices[3 * i + 1] as u32);
                 model.indices.push(mesh.indices[3 * i + 2] as u32);
-            }
-
-            // add uv
-            for uv in 0..mesh.texcoords.len() / 2 {
-                model.uv.push(mesh.texcoords[2 * uv]);
-                model.uv.push(mesh.texcoords[2 * uv + 1]);
             }
         }
 

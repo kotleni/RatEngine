@@ -1,5 +1,5 @@
 use gl::types::{GLchar, GLfloat, GLint, GLsizei, GLsizeiptr, GLuint, GLvoid};
-use crate::model::ObjModel;
+use crate::model::{ObjModel, Vertex};
 use crate::shader::RatShader;
 
 pub struct RatRenderer {
@@ -72,7 +72,7 @@ impl RatRenderer {
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vbo);
             gl::BufferData(
                 gl::ARRAY_BUFFER,
-                (model.vertices.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
+                (model.vertices.len() * std::mem::size_of::<Vertex>()) as GLsizeiptr,
                 model.vertices.as_ptr() as *const GLvoid,
                 gl::STATIC_DRAW,
             );
@@ -85,12 +85,28 @@ impl RatRenderer {
                 gl::STATIC_DRAW,
             );
 
-            // Configure vertex attributes here
-            let stride = 3 * std::mem::size_of::<GLfloat>() as GLsizei;
+            // Check for OpenGL errors
+            let error = gl::GetError();
+            if error != gl::NO_ERROR {
+                panic!("OpenGL error: {:?}", error);
+            }
+
+            // Position attribute
+            let stride = (8 * std::mem::size_of::<GLfloat>()) as GLsizei;
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, std::ptr::null());
             gl::EnableVertexAttribArray(0);
 
-            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+            // Normal attribute
+            let normal_offset = (3 * std::mem::size_of::<GLfloat>()) as *const GLvoid;
+            gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, stride, normal_offset);
+            gl::EnableVertexAttribArray(1);
+
+            // TexCoord attribute
+            let texcoord_offset = (6 * std::mem::size_of::<GLfloat>()) as *const GLvoid;
+            gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, stride, texcoord_offset);
+            gl::EnableVertexAttribArray(2);
+
+            // gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl::BindVertexArray(0);
         }
     }
