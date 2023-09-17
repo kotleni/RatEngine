@@ -79,7 +79,7 @@ impl RatWindow {
         self.sdl.mouse().set_relative_mouse_mode(is_mouse_locked);
 
         let translation = Matrix4::new_translation(&Vector3::new(x, y, z));
-        let rotation = Rotation3::from_euler_angles(0.0, 0.0, 0.0).to_homogeneous();
+        let mut rotation = Rotation3::from_euler_angles(0.0, 0.0, 0.0).to_homogeneous();
         // let mut rotation = Matrix4::new_rotation( Vector3::new(0.0, 0.0, 0.0));
         let scaling = Matrix4::new_scaling(1.0);
 
@@ -140,6 +140,8 @@ impl RatWindow {
             }
 
             self.renderer.render_model(&model);
+
+            rotation *= Rotation3::from_euler_angles(0.0, 0.01, 0.0).to_homogeneous();
 
             self.sdl_window.gl_swap_window();
         }
