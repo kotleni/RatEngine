@@ -7,6 +7,7 @@ in vec3 lightDir;
 
 uniform vec3 objectColor;
 uniform vec3 viewPos;
+uniform sampler2D ourTexture;
 
 out vec4 color;
 
@@ -31,6 +32,6 @@ void main() {
     vec3 specular = specularStrength * spec * lightColor;
 
     vec3 result = (ambient + diffuse + specular) * objectColor;
-    color = vec4(result, 1.0);
-    // color = texture(ourTexture, fragTexCoord) * vec4(result, 1.0);
+    // color = vec4(result, 1.0);
+    color = texture(ourTexture, fragTexCoord) * vec4(result, 1.0);
 }

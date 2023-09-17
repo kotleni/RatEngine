@@ -47,11 +47,11 @@ impl RatWindow {
 
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
-            gl::Enable(gl::CULL_FACE);
+            //gl::Enable(gl::CULL_FACE);
 
             // Cull back faces
-            gl::CullFace(gl::FRONT);
-            gl::FrontFace(gl::CCW);
+            // gl::CullFace(gl::FRONT);
+            // gl::FrontFace(gl::CCW);
 
             // Alpha blending
             gl::Enable(gl::BLEND);
@@ -62,12 +62,12 @@ impl RatWindow {
 
         let mut camera = Camera::new();
 
-        let model = ObjModel::from_file("teapot");
+        let model = ObjModel::from_file("blob", "blob");
         let shader = RatShader::from_file("default");
 
         let x = 0.0;
         let y = 0.0;
-        let z = 220.0;
+        let z = 5.0;
 
         // Lock mouse to window
         let mut is_mouse_locked = true;
@@ -131,7 +131,7 @@ impl RatWindow {
                 let object_color_location = gl::GetUniformLocation(shader_program, CString::new("objectColor").unwrap().as_ptr());
                 gl::Uniform3f(object_color_location, 1.0, 0.5, 0.31);
 
-                gl::UseProgram(shader_program);
+                // gl::UseProgram(shader_program);
             }
 
             self.renderer.render_model(&model);

@@ -69,6 +69,7 @@ impl RatRenderer {
             let mut index_buf: GLuint = 0;
             let mut pos_buf: GLuint = 0;
             let mut norm_buf: GLuint = 0;
+            let mut uv_buf: GLuint = 0;
 
             gl::GenBuffers(1, &mut index_buf);
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, index_buf);
@@ -97,6 +98,15 @@ impl RatRenderer {
                 gl::STATIC_DRAW,
             );
 
+            gl::GenBuffers(1, &mut uv_buf);
+            gl::BindBuffer(gl::ARRAY_BUFFER, uv_buf);
+            gl::BufferData(
+                gl::ARRAY_BUFFER,
+                (mesh.texcoords.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
+                mesh.texcoords.as_ptr() as *const GLvoid,
+                gl::STATIC_DRAW,
+            );
+
             gl::GenVertexArrays(1, &mut self.vao);
             gl::BindVertexArray(self.vao);
 
@@ -112,6 +122,11 @@ impl RatRenderer {
             gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, std::ptr::null());
             gl::EnableVertexAttribArray(1); // Normal
 
+            // UV
+            gl::BindBuffer(gl::ARRAY_BUFFER, uv_buf);
+            gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE, 0, std::ptr::null());
+            gl::EnableVertexAttribArray(2); // UV
+
             gl::BindVertexArray(0);
         }
 
@@ -121,6 +136,8 @@ impl RatRenderer {
     pub fn render_model(&mut self, model: &ObjModel) {
         for m in &model.models {
             let total_indices = self.bind_buffers(m);
+
+            model.material.bind();
 
             unsafe {
                 gl::BindVertexArray(self.vao);

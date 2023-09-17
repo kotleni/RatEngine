@@ -4,6 +4,7 @@ mod utils;
 mod window;
 mod model;
 mod renderer;
+mod material;
 
 extern crate sdl2;
 extern crate gl;

@@ -35,7 +35,7 @@ impl Camera {
             position,
             rotation: Rotation3::from_euler_angles(0.0, 0.0, 0.0),
 
-            move_speed: 3.0,
+            move_speed: 0.1,
             mouse_sensitivity: 0.1,
             yaw: 0.0,
             pitch: 0.0,
