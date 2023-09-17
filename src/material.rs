@@ -1,6 +1,6 @@
 use std::ffi::CString;
 use gl::types::GLuint;
-use stb_image::stb_image::bindgen::{stbi_image_free, stbi_load};
+use stb_image::stb_image::bindgen::{stbi_image_free, stbi_load, stbi_set_flip_vertically_on_load};
 
 pub struct Material {
     texture_id: GLuint,
@@ -18,8 +18,8 @@ impl Material {
             gl::GenTextures(1, &mut texture_id);
             gl::BindTexture(gl::TEXTURE_2D, texture_id);
 
-            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
-            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::FILL as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::FILL as i32);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as i32);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
@@ -27,6 +27,7 @@ impl Material {
             let mut height: i32 = 0;
             let mut nr_channels: i32 = 0;
 
+            stbi_set_flip_vertically_on_load(i32::from(true));
             let data = stbi_load(cpath.as_ptr(), &mut width, &mut height, &mut nr_channels, 0);
             if data.is_null() {
                 let err = stb_image::stb_image::bindgen::stbi_failure_reason();
