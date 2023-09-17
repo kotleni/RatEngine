@@ -8,6 +8,7 @@ mod material;
 mod assets_manager;
 mod rat_cfg;
 mod object;
+mod engine;
 
 extern crate sdl2;
 extern crate gl;

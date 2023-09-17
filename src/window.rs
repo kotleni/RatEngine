@@ -5,6 +5,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::video::{GLProfile, Window};
 use crate::assets_manager::AssetsManager;
 use crate::camera::Camera;
+use crate::engine::engine;
 use crate::model::ObjModel;
 use crate::renderer::RatRenderer;
 use crate::shader::RatShader;
@@ -88,6 +89,8 @@ impl RatWindow {
 
         let object_position = Vector3::new(x, y, z);
         camera.look_at(&object_position, &Vector3::new(0.0, 1.0, 0.0));
+
+        engine().log("Engine started");
 
         let mut event_pump = self.sdl.event_pump().unwrap();
         'main: loop {
