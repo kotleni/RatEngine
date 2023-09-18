@@ -4,11 +4,14 @@ use sdl2::event;
 use sdl2::keyboard::Keycode;
 use crate::assets_manager::AssetsManager;
 use crate::camera::Camera;
+use crate::object::RatObject;
 use crate::window::RatWindow;
 
 pub struct Engine {
     pub window: RatWindow,
     pub camera: Camera,
+
+    pub objects: Vec<RatObject>,
 
     pub is_running: bool
 }
@@ -25,6 +28,8 @@ impl Engine {
             window,
             camera,
 
+            objects: Vec::new(),
+
             is_running: false,
         }
     }
@@ -33,7 +38,9 @@ impl Engine {
         self.is_running = true;
         self.window.set_mouse_locked(true);
 
-        let object = AssetsManager::load_object("rat");
+        let rat1 = self.load_object("rat");
+        let rat2 = self.load_object("rat");
+        rat2.position.z = 4.0;
 
         let mut event_pump = self.window.sdl.event_pump().unwrap();
         while self.is_running {
@@ -55,9 +62,17 @@ impl Engine {
             self.camera.process_input(&event_pump.keyboard_state(), &event_pump.relative_mouse_state());
 
             self.window.renderer.clear();
-            self.window.renderer.render_model(&object, &self.camera);
+            for object in &self.objects {
+                self.window.renderer.render_model(&object, &self.camera);
+            }
             self.window.sdl_window.gl_swap_window();
         }
+    }
+
+    pub fn load_object(&mut self, name: &str) -> &mut RatObject {
+        let mut object = AssetsManager::load_object(name);
+        self.objects.push(object);
+        self.objects.last_mut().unwrap()
     }
 
     pub fn log(&self, msg: &str) {
