@@ -13,9 +13,8 @@ mod engine;
 extern crate sdl2;
 extern crate gl;
 
-use crate::window::RatWindow;
+use crate::engine::engine;
 
 fn main() {
-    let mut window = RatWindow::new(800, 600);
-    window.run_loop();
+    engine().run();
 }
