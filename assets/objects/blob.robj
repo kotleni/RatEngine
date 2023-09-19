@@ -1,0 +1,4 @@
+name = Blob
+model = blob
+material = blob
+weight = 1
