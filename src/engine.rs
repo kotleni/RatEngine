@@ -49,7 +49,7 @@ impl Engine {
 
         let mut is_show_console = false;
 
-        let mut command_line = "";
+        let mut command_line = String::new();
 
         let mut event_pump = self.window.sdl.event_pump().unwrap();
         while self.is_running {
@@ -65,7 +65,7 @@ impl Engine {
                             Keycode::F3 => {
                                 self.window.set_mouse_locked(!self.window.is_mouse_locked);
                             }
-                            _ => {},
+                            _ => { },
                         }
                     },
                     _ => {},
