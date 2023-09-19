@@ -100,7 +100,7 @@ impl Engine {
                                     .hint_text("Enter command")
                             );
                             if ui.button("Send").clicked() {
-                                engine().log(format!("> {}", command_line).as_str());
+                                engine().execute_command(format!("{}", command_line).as_str());
                             }
                         });
                     });
@@ -121,10 +121,94 @@ impl Engine {
         }
     }
 
-    pub fn load_object(&mut self, name: &str) -> &mut RatObject {
-        let mut object = AssetsManager::load_object(name);
+    pub fn load_object(&mut self, _name: &str) -> &mut RatObject {
+        let mut name = _name.to_string();
+
+        // Make name unique
+        let mut index = 0;
+        for object in &self.objects {
+            let object_name = &object.name;
+            if object_name.starts_with(&name) {
+                if object_name.len() == name.len() {
+                    index = 1; // The name itself is present, so start with 1
+                } else if let Some(suffix) = object_name[name.len()..].strip_prefix('_') {
+                    if let Ok(suffix_index) = suffix.parse::<u32>() {
+                        index = index.max(suffix_index + 1);
+                    }
+                }
+            }
+        }
+
+        if index > 0 {
+            name.push_str(&format!("_{}", index));
+        }
+
+
+        let mut object = AssetsManager::load_object(_name);
+        object.name = name;
         self.objects.push(object);
-        self.objects.last_mut().unwrap()
+
+        let object_inmemory = self.objects.last_mut().unwrap();
+        engine().log(format!("Loaded object: {}", object_inmemory.name.to_string()).as_str());
+        object_inmemory
+    }
+
+    pub fn execute_command(&mut self, command: &str) {
+        let mut args = command.split_whitespace();
+        let command_name = args.next().unwrap();
+
+        match command_name {
+            "obj" => {
+                let operation = args.next().unwrap();
+
+                match operation {
+                    "load" => {
+                        let object_name = args.next().unwrap();
+                        self.load_object(object_name);
+                    }
+                    "list" => {
+                        for object in &engine().objects {
+                            self.log(format!("{}", object.name).as_str());
+                        }
+                    }
+                    "remove" => {
+                        let object_name = args.next().unwrap();
+                        let mut index = 0;
+                        for object in &self.objects {
+                            if object.name == object_name {
+                                break;
+                            }
+                            index += 1;
+                        }
+                        self.objects.remove(index);
+                    }
+                    "moveto" => {
+                        let object_name = args.next().unwrap();
+                        let x = args.next().unwrap().parse::<f32>().unwrap();
+                        let y = args.next().unwrap().parse::<f32>().unwrap();
+                        let z = args.next().unwrap().parse::<f32>().unwrap();
+                        let mut index = 0;
+                        for object in &mut engine().objects {
+                            if object.name == object_name {
+                                object.position = Vector3::new(x, y, z);
+                                engine().log(format!("Moved object {} to ({}, {}, {})", object_name, x, y, z).as_str());
+                                break;
+                            }
+                            index += 1;
+                        }
+                    }
+                    _ => {
+                        self.log(format!("Unknown operation: {}", operation).as_str());
+                    }
+                }
+            }
+            "quit" => {
+                self.is_running = false;
+            }
+            _ => {
+                self.log(format!("Unknown command: {}", command_name).as_str());
+            }
+        }
     }
 
     pub fn log(&mut self, msg: &str) {
