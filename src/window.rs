@@ -1,11 +1,18 @@
 use sdl2::video::{GLProfile, Window};
 use crate::renderer::RatRenderer;
+use egui_sdl2_gl::ShaderVersion;
+use egui_sdl2_gl::DpiScaling;
+use egui_sdl2_gl::painter::Painter;
+use egui_sdl2_gl as egui_backend;
 
 pub struct RatWindow {
     pub sdl: sdl2::Sdl,
     pub video_subsystem: sdl2::VideoSubsystem,
     pub sdl_window: Window,
     pub renderer: RatRenderer,
+    pub egui_painter: Painter,
+    pub egui_state: egui_backend::EguiStateHandler,
+    pub egui_ctx: egui::Context,
     pub is_mouse_locked: bool,
 
     _gl_context: sdl2::video::GLContext,
@@ -35,9 +42,12 @@ impl RatWindow {
         let _gl_context = window.gl_create_context().unwrap();
         gl::load_with(|s| video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void);
 
+        let (mut egui_painter, egui_state) = egui_backend::with_sdl2(&window, ShaderVersion::Default, DpiScaling::Custom(1.0));
+        let egui_ctx = egui::Context::default();
+
         // Configure OpenGL
         unsafe {
-            gl::Enable(gl::DEPTH_TEST);
+            //gl::Enable(gl::DEPTH_TEST); // moved to render pipeline
             gl::Enable(gl::MULTISAMPLE);
 
             // Alpha blending
@@ -52,6 +62,9 @@ impl RatWindow {
             video_subsystem,
             sdl_window: window,
             renderer: RatRenderer::new(),
+            egui_painter,
+            egui_state,
+            egui_ctx,
             is_mouse_locked: false,
 
             _gl_context

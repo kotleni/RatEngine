@@ -10,4 +10,6 @@ tobj = "4.0.0"
 nalgebra = "0.32.3"
 nalgebra-glm = "0.18.0"
 stb_image = "0.2.5"
-lazy_static = { version = "1.4.0", features = [] }
+egui = "0.22.0"
+egui_sdl2_gl = "0.22.1"
+egui_backend = "0.4.0"
