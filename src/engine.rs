@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::time::Instant;
 use egui::{Frame, FullOutput, Style, Widget};
 use nalgebra::Vector3;
@@ -20,8 +21,10 @@ pub struct Engine {
 
 impl Engine {
     pub fn load() -> Self {
+        // Prepare window
         let mut window = RatWindow::new(1400, 800);
 
+        // Prepare camera
         let mut camera = Camera::new();
         let object_position = Vector3::new(0.0, 3.0, 0.0);
         camera.look_at(&object_position, &Vector3::new(0.0, 1.0, 0.0));
@@ -41,9 +44,7 @@ impl Engine {
         self.is_running = true;
         self.window.set_mouse_locked(true);
 
-        let rat1 = self.load_object("rat");
-        let rat2 = self.load_object("rat");
-        rat2.position.z = 4.0;
+        engine().execute_commands_file("autoexec.cmds");
 
         let start_time = Instant::now();
 
@@ -121,6 +122,8 @@ impl Engine {
         }
     }
 
+    // MARK: This method contains bad code
+    // TODO: I need to refactor this method
     pub fn load_object(&mut self, _name: &str) -> &mut RatObject {
         let mut name = _name.to_string();
 
@@ -191,6 +194,7 @@ impl Engine {
                         for object in &mut engine().objects {
                             if object.name == object_name {
                                 object.position = Vector3::new(x, y, z);
+                                println!("Vector3({}, {}, {})", object.position.x, object.position.y, object.position.z);
                                 engine().log(format!("Moved object {} to ({}, {}, {})", object_name, x, y, z).as_str());
                                 break;
                             }
@@ -211,6 +215,17 @@ impl Engine {
         }
     }
 
+    pub fn execute_commands_file(&mut self, file_path: &str) {
+        let path = format!("assets/{}", file_path);
+        let file = std::fs::read_to_string(path).unwrap();
+        for line in file.lines() {
+            if line.starts_with(';') || line.is_empty() {
+                continue;
+            }
+            self.execute_command(line);
+        }
+    }
+
     pub fn log(&mut self, msg: &str) {
         let text = format!("{}\n", msg);
 
@@ -219,7 +234,8 @@ impl Engine {
     }
 }
 
-// MARK: big brain singleton
+// MARK: Big brain singleton
+// MARK: Maybe I should use lazy_static instead?
 // YOU CAN'T USE engine() BEFORE IT'S INITIALIZED!
 static mut ENGINE: Option<Engine> = None;
 pub fn engine() -> &'static mut Engine {

@@ -1,0 +1,6 @@
+; this commands automatically loads
+obj load rat
+obj moveto rat 0 0 0
+
+obj load rat
+obj moveto rat_1 0 0 5
