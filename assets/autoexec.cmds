@@ -1,16 +1,17 @@
 ; this commands automatically loads
 
-; bug, fist object is not rendered
+; rat
 obj load rat
+obj moveto rat 0 5 0
 
+; rat_1
 obj load rat
-obj moveto rat_1 0 0 0
+obj moveto rat_1 0 -5 0
 
+; blob
 obj load blob
 obj moveto blob 0 10 0
 
+; blob_1
 obj load blob
-obj moveto blob_1 0 10 10
-
-obj load blob
-obj moveto blob_2 0 0 10
+obj moveto blob_1 0 -10 0
