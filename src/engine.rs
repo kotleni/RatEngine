@@ -240,6 +240,13 @@ impl Engine {
 
         print!("{}", text);
         self.log_output.push_str(text.as_str());
+
+        // Check if log is too long and cut it
+        let max_log_length = 1200;
+        if self.log_output.len() > max_log_length {
+            let excess_len = self.log_output.len() - max_log_length;
+            self.log_output = self.log_output.chars().skip(excess_len).collect();
+        }
     }
 }
 
