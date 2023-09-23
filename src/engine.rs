@@ -62,9 +62,15 @@ impl Engine {
                         match keycode.unwrap() {
                             Keycode::F2 => {
                                 is_show_console = !is_show_console;
+
+                                self.window.set_mouse_locked(!is_show_console);
                             }
                             Keycode::F3 => {
                                 self.window.set_mouse_locked(!self.window.is_mouse_locked);
+
+                                if self.window.is_mouse_locked {
+                                    is_show_console = false;
+                                }
                             }
                             _ => { },
                         }
@@ -86,37 +92,39 @@ impl Engine {
             }
             unsafe { gl::Disable(gl::DEPTH_TEST); }
 
-            // self.window.egui_state.input.time = Some(start_time.elapsed().as_secs_f64());
-            // self.window.egui_ctx.begin_frame(self.window.egui_state.input.take());
-            //
-            // if is_show_console {
-            //     egui::Window::new("Console")
-            //         .show(&self.window.egui_ctx, |ui| {
-            //             ui.label(&engine().log_output);
-            //
-            //             // horizontal layout
-            //             ui.horizontal(|ui| {
-            //                 ui.add(
-            //                     egui::TextEdit::singleline(&mut command_line)
-            //                         .hint_text("Enter command")
-            //                 );
-            //                 if ui.button("Send").clicked() {
-            //                     engine().execute_command(format!("{}", command_line).as_str());
-            //                 }
-            //             });
-            //         });
-            // }
-            //
-            // let FullOutput {
-            //     platform_output,
-            //     repaint_after,
-            //     textures_delta,
-            //     shapes,
-            // } = self.window.egui_ctx.end_frame();
-            // self.window.egui_state.process_output(&self.window.sdl_window, &platform_output);
-            //
-            // let paint_jobs = self.window.egui_ctx.tessellate(shapes);
-            // self.window.egui_painter.paint_jobs(None, textures_delta, paint_jobs);
+            self.window.egui_state.input.time = Some(start_time.elapsed().as_secs_f64());
+            self.window.egui_ctx.begin_frame(self.window.egui_state.input.take());
+
+            if is_show_console {
+                egui::Window::new("Console")
+                    .show(&self.window.egui_ctx, |ui| {
+                        ui.label(&engine().log_output);
+
+                        // horizontal layout
+                        ui.horizontal(|ui| {
+                            ui.add(
+                                egui::TextEdit::singleline(&mut command_line)
+                                    .hint_text("Enter command")
+                            );
+                            if ui.button("Send").clicked() {
+                                engine().execute_command(format!("{}", command_line).as_str());
+                            }
+                        });
+                    });
+            }
+
+            if is_show_console {
+                let FullOutput {
+                    platform_output,
+                    repaint_after,
+                    textures_delta,
+                    shapes,
+                } = self.window.egui_ctx.end_frame();
+                self.window.egui_state.process_output(&self.window.sdl_window, &platform_output);
+
+                let paint_jobs = self.window.egui_ctx.tessellate(shapes);
+                self.window.egui_painter.paint_jobs(None, textures_delta, paint_jobs);
+            }
 
             self.window.sdl_window.gl_swap_window();
         }
