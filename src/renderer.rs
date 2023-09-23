@@ -93,6 +93,8 @@ impl RatRenderer {
             gl::EnableVertexAttribArray(2); // UV
 
             gl::BindVertexArray(0);
+            gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, 0);
         }
 
         mesh.indices.len() as i32
