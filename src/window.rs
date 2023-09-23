@@ -30,7 +30,9 @@ extern "system" fn gl_debug_callback(source: GLenum,
     let message = unsafe { std::ffi::CStr::from_ptr(message).to_str().unwrap() };
     if severity != gl::DEBUG_SEVERITY_NOTIFICATION {
         let formatted = format!("OpenGL debug message: {:?} {:?} {:?} {:?} {:?}", source, gltype, id, severity, message);
-        engine().log(formatted.as_str());
+        println!("{}", formatted);
+        // MARK: removed: engine().log(formatted.as_str());
+        // MARK: gl logs too much messages at this time
     }
 }
 
