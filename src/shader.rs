@@ -2,6 +2,7 @@ use std::ffi::CString;
 use gl::types::{GLchar, GLint, GLuint};
 use nalgebra::Matrix4;
 use crate::camera::Camera;
+use crate::engine::engine;
 use crate::object::RatObject;
 
 pub struct RatShader {
@@ -111,6 +112,11 @@ impl RatShader {
             let objcolor_name = CString::new("objectColor").unwrap();
             let object_color_location = gl::GetUniformLocation(self.shader_program, objcolor_name.as_ptr());
             gl::Uniform3f(object_color_location, 1.0, 0.5, 0.31);
+
+            // time
+            let time_name = CString::new("time").unwrap();
+            let time_location = gl::GetUniformLocation(self.shader_program, time_name.as_ptr());
+            gl::Uniform1f(time_location, engine().get_time());
 
             gl::UseProgram(self.shader_program);
         }

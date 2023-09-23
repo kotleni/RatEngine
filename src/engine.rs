@@ -1,5 +1,6 @@
 use std::time::Instant;
 use egui::{FullOutput};
+use gl::types::GLfloat;
 use nalgebra::Vector3;
 use sdl2::event;
 use sdl2::keyboard::Keycode;
@@ -17,6 +18,7 @@ pub struct Engine {
     pub log_output: String,
     pub is_running: bool
 }
+
 
 impl Engine {
     pub fn load() -> Self {
@@ -244,6 +246,11 @@ impl Engine {
             let excess_len = self.log_output.len() - max_log_length;
             self.log_output = self.log_output.chars().skip(excess_len).collect();
         }
+    }
+
+    pub fn get_time(&self) -> GLfloat {
+        let ms = self.window.sdl.timer().unwrap().ticks();
+        ms as f32 / 1000.0
     }
 }
 
