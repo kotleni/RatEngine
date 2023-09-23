@@ -128,7 +128,11 @@ impl AssetsManager {
     }
 
     pub fn load_cfg(path: &str) -> RatCfg {
-        let content = std::fs::read_to_string(path).unwrap();
+        let content = std::fs::read_to_string(path);
+        if content.is_err() {
+            panic!("Failed to load cfg file: {}", path);
+        }
+        let content = content.unwrap();
         let lines = content.lines();
 
         let mut dict = std::collections::HashMap::new();
