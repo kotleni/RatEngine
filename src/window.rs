@@ -28,8 +28,10 @@ extern "system" fn gl_debug_callback(source: GLenum,
                      message: *const GLchar,
                      userParam: *mut std::ffi::c_void) {
     let message = unsafe { std::ffi::CStr::from_ptr(message).to_str().unwrap() };
-    let formatted = format!("OpenGL debug message: {:?} {:?} {:?} {:?} {:?}", source, gltype, id, severity, message);
-    engine().log(formatted.as_str());
+    if severity != gl::DEBUG_SEVERITY_NOTIFICATION {
+        let formatted = format!("OpenGL debug message: {:?} {:?} {:?} {:?} {:?}", source, gltype, id, severity, message);
+        engine().log(formatted.as_str());
+    }
 }
 
 impl RatWindow {
