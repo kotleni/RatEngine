@@ -4,6 +4,8 @@ use egui_sdl2_gl::ShaderVersion;
 use egui_sdl2_gl::DpiScaling;
 use egui_sdl2_gl::painter::Painter;
 use egui_sdl2_gl as egui_backend;
+use gl::types::{GLchar, GLenum, GLsizei, GLuint};
+use crate::engine::engine;
 
 pub struct RatWindow {
     pub sdl: sdl2::Sdl,
@@ -16,6 +18,18 @@ pub struct RatWindow {
     pub is_mouse_locked: bool,
 
     _gl_context: sdl2::video::GLContext,
+}
+
+extern "system" fn gl_debug_callback(source: GLenum,
+                     gltype: GLenum,
+                     id: GLuint,
+                     severity: GLenum,
+                     length: GLsizei,
+                     message: *const GLchar,
+                     userParam: *mut std::ffi::c_void) {
+    let message = unsafe { std::ffi::CStr::from_ptr(message).to_str().unwrap() };
+    let formatted = format!("OpenGL debug message: {:?} {:?} {:?} {:?} {:?}", source, gltype, id, severity, message);
+    engine().log(formatted.as_str());
 }
 
 impl RatWindow {
@@ -49,6 +63,9 @@ impl RatWindow {
         unsafe {
             //gl::Enable(gl::DEPTH_TEST); // moved to render pipeline
             gl::Enable(gl::MULTISAMPLE);
+            gl::Enable(gl::DEBUG_CALLBACK_FUNCTION);
+
+            gl::DebugMessageCallback(Some(gl_debug_callback), std::ptr::null());
 
             // Alpha blending
             gl::Enable(gl::BLEND);
