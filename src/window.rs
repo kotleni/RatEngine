@@ -5,7 +5,6 @@ use egui_sdl2_gl::DpiScaling;
 use egui_sdl2_gl::painter::Painter;
 use egui_sdl2_gl as egui_backend;
 use gl::types::{GLchar, GLenum, GLsizei, GLuint};
-use crate::engine::engine;
 
 pub struct RatWindow {
     pub sdl: sdl2::Sdl,
@@ -21,12 +20,12 @@ pub struct RatWindow {
 }
 
 extern "system" fn gl_debug_callback(source: GLenum,
-                     gltype: GLenum,
-                     id: GLuint,
-                     severity: GLenum,
-                     length: GLsizei,
-                     message: *const GLchar,
-                     userParam: *mut std::ffi::c_void) {
+                                     gltype: GLenum,
+                                     id: GLuint,
+                                     severity: GLenum,
+                                     _length: GLsizei,
+                                     message: *const GLchar,
+                                     _user_param: *mut std::ffi::c_void) {
     let message = unsafe { std::ffi::CStr::from_ptr(message).to_str().unwrap() };
     if severity != gl::DEBUG_SEVERITY_NOTIFICATION {
         let formatted = format!("OpenGL debug message: {:?} {:?} {:?} {:?} {:?}", source, gltype, id, severity, message);
@@ -60,7 +59,7 @@ impl RatWindow {
         let _gl_context = window.gl_create_context().unwrap();
         gl::load_with(|s| video_subsystem.gl_get_proc_address(s) as *const std::os::raw::c_void);
 
-        let (mut egui_painter, egui_state) = egui_backend::with_sdl2(&window, ShaderVersion::Default, DpiScaling::Custom(1.0));
+        let (egui_painter, egui_state) = egui_backend::with_sdl2(&window, ShaderVersion::Default, DpiScaling::Custom(1.0));
         let egui_ctx = egui::Context::default();
 
         // Configure OpenGL

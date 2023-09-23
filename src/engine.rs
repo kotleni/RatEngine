@@ -1,6 +1,5 @@
-use std::fmt::format;
 use std::time::Instant;
-use egui::{Frame, FullOutput, Style, Widget};
+use egui::{FullOutput};
 use nalgebra::Vector3;
 use sdl2::event;
 use sdl2::keyboard::Keycode;
@@ -22,7 +21,7 @@ pub struct Engine {
 impl Engine {
     pub fn load() -> Self {
         // Prepare window
-        let mut window = RatWindow::new(1400, 800);
+        let window = RatWindow::new(1400, 800);
 
         // Prepare camera
         let mut camera = Camera::new();
@@ -116,7 +115,7 @@ impl Engine {
             if is_show_console {
                 let FullOutput {
                     platform_output,
-                    repaint_after,
+                    repaint_after: _repaint_after,
                     textures_delta,
                     shapes,
                 } = self.window.egui_ctx.end_frame();
@@ -200,14 +199,12 @@ impl Engine {
                         let x = args.next().unwrap().parse::<f32>().unwrap();
                         let y = args.next().unwrap().parse::<f32>().unwrap();
                         let z = args.next().unwrap().parse::<f32>().unwrap();
-                        let mut index = 0;
                         for object in &mut engine().objects {
                             if object.name == object_name {
                                 object.position = Vector3::new(x, y, z);
                                 engine().log(format!("Moved object {} to ({}, {}, {})", object.name, x, y, z).as_str());
                                 break;
                             }
-                            index += 1;
                         }
                     }
                     _ => {

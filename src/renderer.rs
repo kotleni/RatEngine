@@ -1,9 +1,7 @@
-use gl::types::{GLchar, GLfloat, GLint, GLsizeiptr, GLuint, GLvoid};
+use gl::types::{GLfloat, GLsizeiptr, GLuint, GLvoid};
 use tobj::Model;
 use crate::camera::Camera;
-use crate::model::{ObjModel};
 use crate::object::RatObject;
-use crate::shader::RatShader;
 
 pub struct RatRenderer {
     pub vao: GLuint,

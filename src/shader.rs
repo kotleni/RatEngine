@@ -2,7 +2,6 @@ use std::ffi::CString;
 use gl::types::{GLchar, GLint, GLuint};
 use nalgebra::Matrix4;
 use crate::camera::Camera;
-use crate::model::ObjModel;
 use crate::object::RatObject;
 
 pub struct RatShader {
@@ -77,7 +76,8 @@ impl RatShader {
     pub fn bind(&self, object: &RatObject, camera: &Camera) {
         unsafe {
             // model matrix
-            let model_location = gl::GetUniformLocation(self.shader_program, CString::new("model").unwrap().as_ptr());
+            let model_name = CString::new("model").unwrap();
+            let model_location = gl::GetUniformLocation(self.shader_program, model_name.as_ptr());
             let translation = Matrix4::new_translation(&object.position);
             let rotation = Matrix4::from(object.rotation);
             let scale = Matrix4::new_scaling(1.0); // TODO: Not implemented yet
@@ -86,25 +86,30 @@ impl RatShader {
             gl::UniformMatrix4fv(model_location, 1, gl::FALSE, model_matrix.as_slice().as_ptr());
 
             // view matrix
-            let view_location = gl::GetUniformLocation(self.shader_program, CString::new("view").unwrap().as_ptr());
+            let view_name = CString::new("view").unwrap();
+            let view_location = gl::GetUniformLocation(self.shader_program, view_name.as_ptr());
             let view = camera.view_matrix;
             gl::UniformMatrix4fv(view_location, 1, gl::FALSE, view.as_slice().as_ptr());
 
             // projection matrix
-            let projection_location = gl::GetUniformLocation(self.shader_program, CString::new("projection").unwrap().as_ptr());
+            let proj_name = CString::new("projection").unwrap();
+            let projection_location = gl::GetUniformLocation(self.shader_program, proj_name.as_ptr());
             gl::UniformMatrix4fv(projection_location, 1, gl::FALSE, camera.projection_matrix.as_slice().as_ptr());
 
             // light position
-            let light_position_location = gl::GetUniformLocation(self.shader_program, CString::new("lightPos").unwrap().as_ptr());
+            let lightpos_name = CString::new("lightPos").unwrap();
+            let light_position_location = gl::GetUniformLocation(self.shader_program, lightpos_name.as_ptr());
             gl::Uniform3f(light_position_location, 9.0, 10.0, 9.0);
 
             // view position
-            let light_color_location = gl::GetUniformLocation(self.shader_program, CString::new("viewPos").unwrap().as_ptr());
+            let viewpos_name = CString::new("viewPos").unwrap();
+            let light_color_location = gl::GetUniformLocation(self.shader_program, viewpos_name.as_ptr());
             let view_position = camera.position;
             gl::Uniform3f(light_color_location, view_position.x, view_position.y, view_position.z);
 
             // object color
-            let object_color_location = gl::GetUniformLocation(self.shader_program, CString::new("objectColor").unwrap().as_ptr());
+            let objcolor_name = CString::new("objectColor").unwrap();
+            let object_color_location = gl::GetUniformLocation(self.shader_program, objcolor_name.as_ptr());
             gl::Uniform3f(object_color_location, 1.0, 0.5, 0.31);
 
             gl::UseProgram(self.shader_program);
