@@ -1,6 +1,7 @@
 use std::ffi::CString;
 use gl::types::GLuint;
 use stb_image::stb_image::bindgen::{stbi_image_free, stbi_load, stbi_set_flip_vertically_on_load};
+use crate::engine::engine;
 use crate::material::Material;
 use crate::model::ObjModel;
 use crate::object::RatObject;
@@ -98,6 +99,7 @@ impl AssetsManager {
         let texture_name = cfg.get_str("texture");
         let texture = AssetsManager::load_texture(&texture_name);
 
+        engine().log(format!("Loaded material: {}", name).as_str());
         Material {
             name,
             shader,
@@ -118,6 +120,7 @@ impl AssetsManager {
             &options
         ).expect("Failed to OBJ load file");
 
+        engine().log(format!("Loaded model: {} ({} meshes)", obj_name, models.len()).as_str());
         ObjModel { models, material }
     }
 
