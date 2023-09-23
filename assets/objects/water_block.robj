@@ -1,0 +1,4 @@
+name = Water rat
+model = water_block
+material = water_block
+weight = 1

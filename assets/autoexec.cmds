@@ -15,3 +15,11 @@ obj moveto blob 0 10 0
 ; blob_1
 obj load blob
 obj moveto blob_1 0 -10 0
+
+; water_rat
+obj load water_block
+obj moveto water_block 0 15 0
+
+; water_block
+obj load water_block
+obj moveto water_block 0 15 15
