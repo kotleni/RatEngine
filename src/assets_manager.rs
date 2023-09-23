@@ -96,8 +96,11 @@ impl AssetsManager {
         let shader_name = cfg.get_str("shader");
         let shader = AssetsManager::load_shader(&shader_name);
 
+        let mut texture = 0;
         let texture_name = cfg.get_str("texture");
-        let texture = AssetsManager::load_texture(&texture_name);
+        if texture_name != "none" {
+            texture = AssetsManager::load_texture(&texture_name);
+        }
 
         engine().log(format!("Loaded material: {}", name).as_str());
         Material {
