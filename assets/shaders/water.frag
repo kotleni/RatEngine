@@ -12,7 +12,7 @@ void main() {
 
     float colorOffset = 0.05 * sin(oTime + fragPos.x + fragPos.z * 2.5);
 
-    vec3 waterColor = vec3(0.2 + colorOffset, 0.1 + color_offset, 0.6 + color_offset);
+    vec3 waterColor = vec3(0.2 + colorOffset, 0.1 + colorOffset, 0.6 + colorOffset);
     float shininess = 0;
 
     // Calculate the direction vector from the fragment to the light source
