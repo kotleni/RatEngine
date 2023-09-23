@@ -86,37 +86,37 @@ impl Engine {
             }
             unsafe { gl::Disable(gl::DEPTH_TEST); }
 
-            self.window.egui_state.input.time = Some(start_time.elapsed().as_secs_f64());
-            self.window.egui_ctx.begin_frame(self.window.egui_state.input.take());
-
-            if is_show_console {
-                egui::Window::new("Console")
-                    .show(&self.window.egui_ctx, |ui| {
-                        ui.label(&engine().log_output);
-
-                        // horizontal layout
-                        ui.horizontal(|ui| {
-                            ui.add(
-                                egui::TextEdit::singleline(&mut command_line)
-                                    .hint_text("Enter command")
-                            );
-                            if ui.button("Send").clicked() {
-                                engine().execute_command(format!("{}", command_line).as_str());
-                            }
-                        });
-                    });
-            }
-
-            let FullOutput {
-                platform_output,
-                repaint_after,
-                textures_delta,
-                shapes,
-            } = self.window.egui_ctx.end_frame();
-            self.window.egui_state.process_output(&self.window.sdl_window, &platform_output);
-
-            let paint_jobs = self.window.egui_ctx.tessellate(shapes);
-            self.window.egui_painter.paint_jobs(None, textures_delta, paint_jobs);
+            // self.window.egui_state.input.time = Some(start_time.elapsed().as_secs_f64());
+            // self.window.egui_ctx.begin_frame(self.window.egui_state.input.take());
+            //
+            // if is_show_console {
+            //     egui::Window::new("Console")
+            //         .show(&self.window.egui_ctx, |ui| {
+            //             ui.label(&engine().log_output);
+            //
+            //             // horizontal layout
+            //             ui.horizontal(|ui| {
+            //                 ui.add(
+            //                     egui::TextEdit::singleline(&mut command_line)
+            //                         .hint_text("Enter command")
+            //                 );
+            //                 if ui.button("Send").clicked() {
+            //                     engine().execute_command(format!("{}", command_line).as_str());
+            //                 }
+            //             });
+            //         });
+            // }
+            //
+            // let FullOutput {
+            //     platform_output,
+            //     repaint_after,
+            //     textures_delta,
+            //     shapes,
+            // } = self.window.egui_ctx.end_frame();
+            // self.window.egui_state.process_output(&self.window.sdl_window, &platform_output);
+            //
+            // let paint_jobs = self.window.egui_ctx.tessellate(shapes);
+            // self.window.egui_painter.paint_jobs(None, textures_delta, paint_jobs);
 
             self.window.sdl_window.gl_swap_window();
         }
@@ -157,6 +157,8 @@ impl Engine {
     }
 
     pub fn execute_command(&mut self, command: &str) {
+        engine().log(format!("> {}", command).as_str());
+
         let mut args = command.split_whitespace();
         let command_name = args.next().unwrap();
 
@@ -171,7 +173,7 @@ impl Engine {
                     }
                     "list" => {
                         for object in &engine().objects {
-                            self.log(format!("{}", object.name).as_str());
+                            self.log(format!("{} ({})", object.name, object.position).as_str());
                         }
                     }
                     "remove" => {
@@ -194,8 +196,7 @@ impl Engine {
                         for object in &mut engine().objects {
                             if object.name == object_name {
                                 object.position = Vector3::new(x, y, z);
-                                println!("Vector3({}, {}, {})", object.position.x, object.position.y, object.position.z);
-                                engine().log(format!("Moved object {} to ({}, {}, {})", object_name, x, y, z).as_str());
+                                engine().log(format!("Moved object {} to ({}, {}, {})", object.name, x, y, z).as_str());
                                 break;
                             }
                             index += 1;
@@ -229,7 +230,7 @@ impl Engine {
     pub fn log(&mut self, msg: &str) {
         let text = format!("{}\n", msg);
 
-        println!("{}", text);
+        print!("{}", text);
         self.log_output.push_str(text.as_str());
     }
 }
